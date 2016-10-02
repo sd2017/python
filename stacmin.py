@@ -1,7 +1,7 @@
 import sys
 import traceback
 import cgitb
-from enum import Enum
+
 
 cgitb.enable(format='text')
 
@@ -39,69 +39,54 @@ class StakMin:
         return self.minValue
 
 
-# class push
-# class pop
-# class min
-# class commander
-class CommandType():
-    PUSH = 0
-    POP = 1
-    MIN = 2
-
-    def __init__(self):
-        pass
-
-    def tostring(self, val):
-        #members = [attr for attr in dir(self) if not callable(getattr(self,attr)) and not attr.startswith("__")]
-        #print members
-        members = {0: "PUSH", 1: "POP", 2: "MIN"}
-        return members[val]
-        #for k, v in vars(CommandType()).iteritems():
-        #    if v == val:
-        #        return k
-
-    def fromstring(self, str):
-        # type: (object, object) -> object
-        return getattr(self, str.upper(), None)
 
 
 class commander:
-    stack_min = StakMin()
+    stack_min = None;
 
-
-
-    def execute(self, Value):
+    def __init__(self):
+       self.num_parameters=0
+       self.value = 0
+       self.has_res = True
+    @staticmethod
+    def set_stack(inn):
+        commander.stack_min=inn
+    def execute(self, value):
         return
 
-    def executenv(self):
-        Value = self.stack_min.min()
-        return Value
 
 
 class push(commander):
-    def execute(self, Value):
-        self.stack_min.push(Value)
+    def __init__(self):
+       self.num_parameters=1
+       self.value = 0
+       self.has_res = False
 
+    def execute(self, value ):
+        self.stack_min.push(value)
+        return self.value
 
 class pop(commander):
-    def executenv(self):
+    def execute(self,value):
         res = self.stack_min.pop()
         return res
 
 
 class min(commander):
-    def executenv(self):
+    def execute(self,value):
         res = self.stack_min.min()
         return res
 
 
 class tester:
     def __init__(self):
+        commander.set_stack(StakMin())
         self.StackMin = min()
         self.StackPush = push()
         self.StackPop = pop()
-        self.CommandEnum = CommandType()
-        self.Command =pop()
+
+        self.Command =None
+        self.commands={"PUSH":self.StackPush,"POP":self.StackPop,"MIN":self.StackMin}
     def parseSecond(self, parameters):
 
         num = int(parameters[1])
@@ -116,40 +101,15 @@ class tester:
             self.parseSingle(parameters)
 
     def parseSingle(self, parameters):
-        command_enum = self.CommandEnum.fromstring(parameters[0])
-        # if command_enum is CommandType:
-        #     pass
-        # else:
-        #     command_enum=None
-
-        num = StakMin.MAXNUMBER
-        command_size = 1
-        res = StakMin.MAXNUMBER
-        if command_enum == CommandType.MIN:
-            self.Command = self.StackMin
-
-        elif command_enum == CommandType.POP:
-            self.Command = self.StackPop
-
-        elif command_enum == CommandType.PUSH:
-            self.Command = self.StackPush
-            num = self.parseSecond(parameters)
-            res = num
-            command_size = 2
-
-        else:
-            pass
-        tmp = self.CommandEnum.tostring(command_enum)
-        #print("command %d %s " % (command_enum,self.CommandEnum.tostring(command_enum)))
-        print("command  %s " % ( self.CommandEnum.tostring(command_enum)))
-        if command_size == 1:
-            res = self.Command.executenv()
-
-        elif command_size == 2:
-            self.Command.execute(num)
-
-        print("res %s " % (res))
-        #print("stack %s " % (self.Command.stack_min.stack))
+            num = 0
+            self.Command = self.commands[parameters[0]]
+            if (self.Command.num_parameters==1):
+               num = self.parseSecond(parameters)
+            print parameters
+            res=self.Command.execute(num)
+            if (self.Command.has_res):
+               print("res %s " % (res))
+            #print("stack %s " % (self.Command.stack_min.stack))
 
 
 def test():
