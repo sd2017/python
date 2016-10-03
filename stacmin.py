@@ -79,7 +79,6 @@ class min(commander):
 
 
 class parser:
-    #def __init__(self,streamin, levelin=logging.DEBUG):
     def __init__(self, logger):
         self.logger=logger
         commander.set_stack(StakMin())
@@ -90,10 +89,6 @@ class parser:
         self.Command =None
         self.commands={"PUSH":self.StackPush,"POP":self.StackPop,"MIN":self.StackMin}
 
-        #self.level=levelin
-        #self.logger = logging.getLogger('stack')
-        #self.logger.setLevel(levelin);
-        #logging.basicConfig(stream=streamin, level=levelin)
     def parseLine(self, line):
         Delimeters = ','
         commands = line.split(Delimeters)
@@ -103,26 +98,21 @@ class parser:
             parameters = command.split(spacers)
             res=self.parse(parameters)
         return res
+
     def parse(self, parameters):
-            num = 0
             self.Command = self.commands[parameters[0]]
             if (self.Command.num_parameters==1):
                self.Command.value = int(parameters[1])
             self.logger.info( parameters)
-            #logging.info( parameters)
             self.res=self.Command.execute()
             if (self.Command.has_res):
                self.logger.info("res %s " % (self.res))
-             #logging.info("res %s " % (self.res))
-            #print("stack %s " % (self.Command.stack_min.stack))
             return self.res
 
-def test():
-    test1 = parser()
-    test1.parseLine("PUSH 10,PUSH 3,PUSH 1,POP,MIN,POP,MIN,PUSH 11,PUSH 7,PUSH 8,PUSH 9,MIN,POP,MIN,POP,MIN,POP,MIN")
 
 if __name__ == "__main__":
     # try:
-    test()
+    test1 = parser()
+    test1.parseLine("PUSH 10,PUSH 3,PUSH 1,POP,MIN,POP,MIN,PUSH 11,PUSH 7,PUSH 8,PUSH 9,MIN,POP,MIN,POP,MIN,POP,MIN")
     # except:
     #    traceback.print_tb(10)

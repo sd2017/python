@@ -2,9 +2,7 @@ import unittest
 import sys
 import StringIO
 import logging
-
 from  stacmin import parser
-
 
 class stackFactory():
     logger_global=1
@@ -58,8 +56,6 @@ class Stacker(unittest.TestCase):
     def setUp(self):
         self.line = ""
         self.expected = []
-        #self.stack = parser(sys.stdout,logging.DEBUG)
-        #self.stack = parser( logging)
         self.stack= stackFactory.Getfactory().newStack()
     def tearDown(self):
         pass #sys.stdout = self.saved_stdout
@@ -69,13 +65,10 @@ class Stacker(unittest.TestCase):
         self.expectency = [None, None, None, 1, 3, 3, 10, None, None, None, None, 7, 9, 7, 8, 7, 7, 10]
 
     def testSerias(self):
-
         self.setSeriasBasic()
         for expected, command in zip(self.expectency, self.line.split(',')):
             actual = self.stack.parseLine(command)
             self.assertEqual(actual, expected)
-
-
 
     def testSeriasNoLog(self):
         self.stack = stackFactory.Getfactory().newStack(stackFactory.logger_local)
@@ -95,7 +88,6 @@ class Stacker(unittest.TestCase):
             self.assertEqual(actual, expected)
             stackFactory.Getfactory().flush()
             self.assertEqual(stackFactory.Getfactory().getlog(), '')
-
 
 if __name__ == "__main__":
     unittest.main()
