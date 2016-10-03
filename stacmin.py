@@ -79,7 +79,9 @@ class min(commander):
 
 
 class parser:
-    def __init__(self, levelin=logging.WARN):
+    #def __init__(self,streamin, levelin=logging.DEBUG):
+    def __init__(self, logger):
+        self.logger=logger
         commander.set_stack(StakMin())
         self.StackMin = min()
         self.StackPush = push()
@@ -87,10 +89,11 @@ class parser:
         self.res=None;
         self.Command =None
         self.commands={"PUSH":self.StackPush,"POP":self.StackPop,"MIN":self.StackMin}
-        self.level=levelin
-        logger = logging.getLogger('stack')
-        logger.setLevel(levelin);
-        #)basicConfig(stream=sys.stdout, level=levelin)
+
+        #self.level=levelin
+        #self.logger = logging.getLogger('stack')
+        #self.logger.setLevel(levelin);
+        #logging.basicConfig(stream=streamin, level=levelin)
     def parseLine(self, line):
         Delimeters = ','
         commands = line.split(Delimeters)
@@ -105,10 +108,12 @@ class parser:
             self.Command = self.commands[parameters[0]]
             if (self.Command.num_parameters==1):
                self.Command.value = int(parameters[1])
-            logging.info( parameters)
+            self.logger.info( parameters)
+            #logging.info( parameters)
             self.res=self.Command.execute()
             if (self.Command.has_res):
-               logging.info("res %s " % (self.res))
+               self.logger.info("res %s " % (self.res))
+             #logging.info("res %s " % (self.res))
             #print("stack %s " % (self.Command.stack_min.stack))
             return self.res
 
