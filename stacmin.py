@@ -86,7 +86,7 @@ class parser:
         self.StackMin = min()
         self.StackPush = push()
         self.StackPop = pop()
-        self.res=None;
+        self.res=None
         self.Command =None
         self.commands={"PUSH":self.StackPush,"POP":self.StackPop,"MIN":self.StackMin}
 

@@ -2,8 +2,53 @@ import unittest
 import sys
 import StringIO
 import logging
+
 from  stacmin import parser
 
+
+class stackFactory():
+    logger_global=1
+    logger_local=2
+    factory=None
+
+    @staticmethod
+    def Getfactory():
+       if (stackFactory.factory==None):
+           stackFactory.factory=stackFactory()
+       return stackFactory.factory
+
+    def __init__(self):
+        self.loggerPolicy=None
+        self.log=None
+        self.pars=None
+
+    def tearDown(self): #TODO
+        pass
+
+    def flush(self):
+        self.handler.flush()
+
+    def getlog(self):
+        return self.stream.getvalue()
+
+    def newStack( self, logger_policy=logger_global,loglevel=logging.WARN ):
+        self.loggerPolicy=logger_policy
+        if logger_policy == stackFactory.logger_global:
+            self.log=logging
+            logging.basicConfig(level=loglevel)
+            self.pars = parser(self.log)
+        elif logger_policy == stackFactory.logger_local:
+            self.stream = StringIO.StringIO()
+            self.handler = logging.StreamHandler(self.stream)
+            self.log = logging.getLogger('mylogger')
+            self.log.setLevel(loglevel)
+            for handler in self.log.handlers:
+                self.log.removeHandler(handler)
+            self.log.addHandler(self.handler)
+            self.pars=parser(self.log)
+        else:
+            pass
+        return self.pars
 
 class Stacker(unittest.TestCase):
     def __init__(self, *args, **kwargs):
@@ -14,13 +59,9 @@ class Stacker(unittest.TestCase):
         self.line = ""
         self.expected = []
         #self.stack = parser(sys.stdout,logging.DEBUG)
-        self.stack = parser( logging)
-
+        #self.stack = parser( logging)
+        self.stack= stackFactory.Getfactory().newStack()
     def tearDown(self):
-        pass #sys.stdout = self.saved_stdout
-
-
-    def rollout(self):
         pass #sys.stdout = self.saved_stdout
 
     def setSeriasBasic(self):
@@ -28,52 +69,32 @@ class Stacker(unittest.TestCase):
         self.expectency = [None, None, None, 1, 3, 3, 10, None, None, None, None, 7, 9, 7, 8, 7, 7, 10]
 
     def testSerias(self):
-        logging.basicConfig( level=logging.ERROR)
+
         self.setSeriasBasic()
         for expected, command in zip(self.expectency, self.line.split(',')):
             actual = self.stack.parseLine(command)
             self.assertEqual(actual, expected)
 
-    def t_estSeriasNoPrint(self):
-        self.out = StringIO.StringIO()
-        try:
-             sys.stdout = self.out
-             sys.stderr = self.out
-        except:
-             raise
-
-        self.stack = parser(self.out,logging.DEBUG)
-        self.setSeriasBasic()
-        try:
-            for expected, command in zip(self.expectency, self.line.split(',')):
-                actual = self.stack.parseLine(command)
-                self.assertEqual(actual, expected)
-
-            expected_out = "a"
-            expected_output_as_bytes = expected_out.encode(encoding='UTF-8')
-            self.assertEqual(self.out.getvalue(), expected_output_as_bytes)
-        finally:
-           logging.debug( self.out.getvalue())
-           print "outputfff", self.out.getvalue()
 
 
-    def testSeriasLogger(self):
-        self.stream = StringIO.StringIO()
-        self.handler = logging.StreamHandler(self.stream)
-        self.log = logging.getLogger('mylogger')
-        self.log.setLevel(logging.ERROR)
-        for handler in self.log.handlers:
-            self.log.removeHandler(handler)
-        self.log.addHandler(self.handler)
-        self.stack = parser(self.log)
+    def testSeriasNoLog(self):
+        self.stack = stackFactory.Getfactory().newStack(stackFactory.logger_local)
         self.setSeriasBasic()
         for expected, command in zip(self.expectency, self.line.split(',')):
             actual = self.stack.parseLine(command)
             self.assertEqual(actual, expected)
-            self.handler.flush()
-            #print '[', self.stream.getvalue(), ']'
-            self.assertEqual(self.stream.getvalue(), '')
+            stackFactory.Getfactory().flush()
+            self.assertEqual(stackFactory.Getfactory().getlog(), '')
 
+
+    def testSeriasLogDebug(self):
+        self.stack = stackFactory.Getfactory().newStack(stackFactory.logger_local,logging.DEBUG)
+        self.setSeriasBasic()
+        for expected, command in zip(self.expectency, self.line.split(',')):
+            actual = self.stack.parseLine(command)
+            self.assertEqual(actual, expected)
+            stackFactory.Getfactory().flush()
+            self.assertEqual(stackFactory.Getfactory().getlog(), '')
 
 
 if __name__ == "__main__":
