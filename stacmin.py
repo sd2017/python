@@ -1,7 +1,7 @@
 import sys
 import traceback
 import cgitb
-
+import logging
 
 cgitb.enable(format='text')
 
@@ -51,7 +51,7 @@ class commander:
     @staticmethod
     def set_stack(inn):
         commander.stack_min=inn
-    def execute(self, value):
+    def execute(self):
         return
 
 
@@ -62,61 +62,59 @@ class push(commander):
        self.value = 0
        self.has_res = False
 
-    def execute(self, value ):
-        self.stack_min.push(value)
-        return self.value
+    def execute(self ):
+        self.stack_min.push(self.value)
+        return None
 
 class pop(commander):
-    def execute(self,value):
+    def execute(self):
         res = self.stack_min.pop()
         return res
 
 
 class min(commander):
-    def execute(self,value):
+    def execute(self):
         res = self.stack_min.min()
         return res
 
 
-class tester:
-    def __init__(self):
+class parser:
+    def __init__(self, levelin=logging.WARN):
         commander.set_stack(StakMin())
         self.StackMin = min()
         self.StackPush = push()
         self.StackPop = pop()
-
+        self.res=None;
         self.Command =None
         self.commands={"PUSH":self.StackPush,"POP":self.StackPop,"MIN":self.StackMin}
-    def parseSecond(self, parameters):
-
-        num = int(parameters[1])
-        return num
-
-    def parsecom(self, line):
+        self.level=levelin
+        logger = logging.getLogger('stack')
+        logger.setLevel(levelin);
+        #)basicConfig(stream=sys.stdout, level=levelin)
+    def parseLine(self, line):
         Delimeters = ','
         commands = line.split(Delimeters)
+        res=None
         for command in commands:
             spacers = ' '
             parameters = command.split(spacers)
-            self.parseSingle(parameters)
-
-    def parseSingle(self, parameters):
+            res=self.parse(parameters)
+        return res
+    def parse(self, parameters):
             num = 0
             self.Command = self.commands[parameters[0]]
             if (self.Command.num_parameters==1):
-               num = self.parseSecond(parameters)
-            print parameters
-            res=self.Command.execute(num)
+               self.Command.value = int(parameters[1])
+            logging.info( parameters)
+            self.res=self.Command.execute()
             if (self.Command.has_res):
-               print("res %s " % (res))
+               logging.info("res %s " % (self.res))
             #print("stack %s " % (self.Command.stack_min.stack))
-
+            return self.res
 
 def test():
-    test1 = tester()
-
-    test1.parsecom("PUSH 10,PUSH 3,PUSH 1,POP,MIN,POP,MIN,PUSH 11,PUSH 7,PUSH 8,PUSH 9,MIN,POP,MIN,POP,MIN,POP,MIN")
-
+    test1 = parser()
+    test1.parseLine("PUSH 10,PUSH 3,PUSH 1,POP,MIN,POP,MIN,PUSH 11,PUSH 7,PUSH 8,PUSH 9,MIN,POP,MIN,POP,MIN,POP,MIN")
 
 if __name__ == "__main__":
     # try:
