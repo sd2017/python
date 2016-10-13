@@ -242,4 +242,5 @@ if __name__=="__main__":
 #    import nose
 #    test=trying()
 #    nose.run()
+#nosetests -s -v   pythonic.py
   pass
