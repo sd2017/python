@@ -336,6 +336,21 @@ def test_case_insensitive_sort_1():
     string_list=["kennedy","Truman","nixson","roozvelt","Raigen","Ford","Obama","boosh"]
     print case_insensitive_sort_1(string_list)
 
+
+#yield return one element , next time function is called , next element will be return
+def flatten(nested):
+  for sublist in nested:
+    for element in sublist:
+      yield element
+
+def test_flatten():
+    nested = [[1, 2], [3, 4], [5]]
+    flatten(nested)
+    for num in flatten(nested):
+        print num
+
+
+
 #heap
 import heapq
     heapq.heapify(the_list)
@@ -778,12 +793,12 @@ def get_thread_storage( ):
 
 #running programs
 import os
-f = os.popen('gnuplot', 'w')
-print >>f, "set yrange[-300:+300]"
-for n in range(300):
-print >>f, "plot %i*cos(x)+%i*log(x+10)" % (n, 150-n)
-f.flush( )
-f.close( )
+    f = os.popen('gnuplot', 'w')
+    print >>f, "set yrange[-300:+300]"
+    for n in range(300):
+      print >>f, "plot %i*cos(x)+%i*log(x+10)" % (n, 150-n)
+    f.flush( )
+    f.close( )
 
 
 
@@ -876,22 +891,6 @@ iteration
 
 
 
-#yield return one element , next time function is called , next element will be return
-def flatten(nested):
-for sublist in nested:
-for element in sublist:
-yield element
-
-
->>> nested = [[1, 2], [3, 4], [5]]
->>> for num in flatten(nested):
-print num
-...
-1
-2
-3
-4
-5
 
 
 
