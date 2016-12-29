@@ -1039,7 +1039,7 @@ def raw(text):
 
 if __name__=="__main__":
     #test_non_greedy_re()
-    test_count_file()   #TBD
+    test_count_file()
     #test_process_all_files_trap_exceptions()
     import nose
     #test=trying()
