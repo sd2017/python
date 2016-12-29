@@ -2,9 +2,140 @@ import logging
 #import unittest
 import threading
 import cStringIO, traceback
+import nose
+import re
+# def test_re_search_tree_letters_word():
+#     str = 'an example word:cat!!'
+#     match = re.search(r'word:\w\w\w', str)
+#     if match:
+#         print 'found--->', match.group()
+#     else:
+#         print 'did not find'
+#
+#         ## Search for pattern 'iii' in string 'piiig'.
+#         ## All of the pattern must match, but it may appear anywhere.
+#         ## On success, match.group() is matched text.
+#
+#
+#     match = re.search(r'iii', 'piiig') = > found, match.group() == "iii"
+#     match = re.search(r'igs', 'piiig') = > not found, match == None
+#
+#     ## . = any char but \n
+#     match = re.search(r'..g', 'piiig') = > found, match.group() == "iig"
+#
+#     ## \d = digit char, \w = word char
+#     match = re.search(r'\d\d\d', 'p123g') = > found, match.group() == "123"
+#     match = re.search(r'\w\w\w', '@@abcd!!') = > found, match.group() == "abc"
+#
+#
+# def test_repeatition():
+#   ## i+ = one or more i's, as many as possible.
+#   match = re.search(r'pi+', 'piiig') =>  found, match.group() == "piii"
+#
+#   ## Finds the first/leftmost solution, and within it drives the +
+#   ## as far as possible (aka 'leftmost and largest').
+#   ## In this example, note that it does not get to the second set of i's.
+#   match = re.search(r'i+', 'piigiiii') =>  found, match.group() == "ii"
+#
+#   ## \s* = zero or more whitespace chars
+#   ## Here look for 3 digits, possibly separated by whitespace.
+#   match = re.search(r'\d\s*\d\s*\d', 'xx1 2   3xx') =>  found, match.group() == "1 2   3"
+#   match = re.search(r'\d\s*\d\s*\d', 'xx12  3xx') =>  found, match.group() == "12  3"
+#   match = re.search(r'\d\s*\d\s*\d', 'xx123xx') =>  found, match.group() == "123"
+#
+#   ## ^ = matches the start of string, so this fails:
+#   match = re.search(r'^b\w+', 'foobar') =>  not found, match == None
+#   ## but without the ^ it succeeds:
+#   match = re.search(r'b\w+', 'foobar') =>  found, match.group() == "bar"
 
 
 
+def test_re_substitute():
+    stringa = 'purple alice@google.com, blah monkey bob@abcdef.com blah dishwasher'
+    ###### re.sub(pat, replacement, str) -- returns new string with all replacements,
+    ###### \1 is group(1), \2 group(2) in the replacement
+    newHostString=re.sub(r'([\w\.-]+)@([\w\.-]+)', r'\1@yo-yoe.com', stringa)
+    print ""
+    print "input:{}".format(stringa)
+    print "outpt:{}".format(newHostString)
+
+
+## purple alice@yo-yo-dyne.com, blah monkey bob@yo-yo-dyne.com blah dishwasher
+
+
+
+
+
+
+def test_non_greedy_re():
+    tag_string= "<b>foo</b> and <i>so on</i>"
+    ex_greedy_search=copy.deepcopy(tag_string)
+    ex_non_greedy_search="<b>"
+    act_greedy=re.search(r'(<.*>)',tag_string).group()
+    act_non_greedy=re.search(r'(<.*?>)', tag_string).group()
+    print ""
+    print "ag:{} ang:{}".format(act_greedy, act_non_greedy)
+    print "eg:{} eng:{}".format(ex_greedy_search, ex_non_greedy_search)
+
+    assert(act_greedy == ex_greedy_search )
+    assert(act_non_greedy == ex_non_greedy_search)
+
+def test_count_file():
+    count_file("count_file.txt", "six")
+
+
+def count_file(filename,strings):
+    rex=r'\b'+strings+r'\b'
+    print "rex={0}".format(rex)
+    pattern=re.compile(rex)
+    max_in_one_line=0
+    max_line_number=0
+    total_found=0
+    with open(filename) as lines:
+        for i,line in enumerate(lines):
+            lista=pattern.findall(line)
+            current=len(lista)
+            print "current={0} found={1} ".format(current,lista)
+            if (current>max_in_one_line):
+                max_in_one_line=current
+                max_line_number=i;
+
+            total_found=total_found+current
+    print "total[{0}] max_line_number[{1}] max_in_one_line[{2}]".format(total_found,max_line_number,max_in_one_line)
+
+
+
+def test_count_in_file():
+    tag_string= "<b>foo</b> and <i>so on</i>"
+    ex_greedy_search=copy.deepcopy(tag_string)
+    ex_non_greedy_search="<b>"
+    act_greedy=re.search(r'(<.*>)',tag_string).group()
+    act_non_greedy=re.search(r'(<.*?>)', tag_string).group()
+    print ""
+    print "ag:{} ang:{}".format(act_greedy, act_non_greedy)
+    print "eg:{} eng:{}".format(ex_greedy_search, ex_non_greedy_search)
+
+    assert(act_greedy == ex_greedy_search )
+    assert(act_non_greedy == ex_non_greedy_search)
+
+
+
+def test_lambda():
+  list_years={1968,1970,1980}
+  leap_years=filter(lambda n:n%4==0,list_years)
+  print "leap_years:{}".format(leap_years)
+
+
+def test_list_comprehension():
+  oldlist=[1,2,3,4,4,5,6,7,6.5,5.5,4.5,3.5]
+  newlist = [x + 100 for x in oldlist if x > 5]
+  print "transformed filtered list:{}".format(newlist)
+
+def test_list_comprehension_words():
+    wordlist = ['mississippi', 'miss', 'lake', 'que']
+    letters = set('aqk')
+    list = [word for word in wordlist if (letters & set(word))]
+    print "wordlist found:{} containing from :{}".format(list,letters)
 
 def process_txt_file(txt, oldfile, newfile):
 
@@ -62,10 +193,6 @@ def deep_copy_clone_members(existing_list_of_dicts):
     new_list_of_dicts = copy.deepcopy(existing_list_of_dicts)
 
 
-def test_list_comperhansion():
-  theoldlist=[1,2,3,4,4,5,6,7,6.5,5.5,4.5,3.5]
-  thenewlist = [x + 100 for x in theoldlist if x > 5]
-  print thenewlist
 
 
 
@@ -265,7 +392,7 @@ def test_dictionary_string_function():
 
 
 
-def dictionary_intersection(dicta,dictb):
+def dictionary_intersection(dictaact_non_greedy,dictb):
     inter = dict.fromkeys([x for x in dicta if x in dictb])
     return inter
 
@@ -304,8 +431,11 @@ def dictionary_keys_intersection(seqa,seqb):
     dictionary_keys_intersection(dicta, dictb)
 
 def test_dictionary_keys_intersection():
-    assert(False)
-#probability
+    #TODO
+    #assert(False)
+    #probability
+    pass
+
 import random
 def random_pick(some_list, probabilities):
     x = random.uniform(0, 1)
@@ -512,23 +642,19 @@ def prety_print_database(cursor, data=None, check_row_lengths=False):
     return "\n".join(result)
 
 
-def test_prety_print_database(cursor, data=None, check_row_lengths=False):
-    prety_print_database(cursor, data, False)
-    raise
-
-
-
-
-
-
-
+def test_prety_print_database():
+    #prety_print_database(cursor, data, False)
+    #raise
+    #TODO
+    pass
 
 
 
 
 
 #debug util
-import sys, traceback
+import sys
+import traceback
 traceOutput = sys.stdout
 watchOutput = sys.stdout
 rawOutput = sys.stdout
@@ -912,8 +1038,15 @@ def raw(text):
 
 
 if __name__=="__main__":
-    test_process_all_files_trap_exceptions()
-    #import nose
+    #test_non_greedy_re()
+    test_count_file()
+    #test_process_all_files_trap_exceptions()
+    import nose
     #test=trying()
     #nose.run()
     #nosetests -s -v   pythonic.py
+
+    module_name = sys.modules[__name__].__file__
+    logging.debug("running nose for package: %s", module_name)
+
+    #result = nose.run(argv=[sys.argv[0],module_name,'-v'])
